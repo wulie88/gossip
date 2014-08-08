@@ -16,6 +16,7 @@ GSConstDefine(GSSIPCallStateDidChangeNotification);
 GSConstDefine(GSSIPIncomingCallNotification);
 GSConstDefine(GSSIPCallMediaStateDidChangeNotification);
 GSConstDefine(GSSIPVolumeDidChangeNotification);
+GSConstDefine(GSSIMMessageDidReceiveNotification);
 
 GSConstDefine(GSVolumeDidChangeNotification);
 
@@ -26,10 +27,11 @@ GSConstDefine(GSSIPDataKey);
 
 GSConstDefine(GSVolumeKey);
 GSConstDefine(GSMicVolumeKey);
+GSConstDefine(GSMessageKey);
 
 
 // helper macros
 #define GSNotifGetInt(notif_, key_) ([[[notif_ userInfo] objectForKey:key_] intValue])
 #define GSNotifGetBool(notif_, key_) ([[[notif_ userInfo] objectForKey:key_] boolValue])
-#define GSNotifGetString(info_, key_) ((NSString *)[[notif_ userInfo] objectForKey:key_]) 
+#define GSNotifGetString(notif_, key_) ((NSString *)[[notif_ userInfo] objectForKey:key_]) 
 

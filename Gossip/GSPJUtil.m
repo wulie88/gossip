@@ -18,7 +18,7 @@
     char *buffer = [data mutableBytes];
     pj_strerror(status, buffer, bufferSize);
     
-    NSString *errorStr = [NSString stringWithCString:buffer encoding:NSASCIIStringEncoding];
+    NSString *errorStr = [NSString stringWithCString:buffer encoding:NSUTF8StringEncoding];
     NSDictionary *info = nil;
     info = [NSDictionary dictionaryWithObjectsAndKeys:
             errorStr, NSLocalizedDescriptionKey,
@@ -38,14 +38,14 @@
     NSString *result = [NSString alloc];
     result = [result initWithBytesNoCopy:pjString->ptr
                                   length:pjString->slen
-                                encoding:NSASCIIStringEncoding
+                                encoding:NSUTF8StringEncoding
                             freeWhenDone:NO];
     
     return result;
 }
 
 + (pj_str_t)PJStringWithString:(NSString *)string {
-    const char *cStr = [string cStringUsingEncoding:NSASCIIStringEncoding]; // TODO: UTF8?
+    const char *cStr = [string cStringUsingEncoding:NSUTF8StringEncoding]; // TODO: UTF8?
 
     pj_str_t result;
     pj_cstr(&result, cStr);

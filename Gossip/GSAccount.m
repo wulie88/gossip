@@ -10,9 +10,19 @@
 #import "GSCall.h"
 #import "GSDispatch.h"
 #import "GSUserAgent.h"
+#import "GSPJUtil.h"
 #import "PJSIP.h"
 #import "Util.h"
 
+void NSString2PjStr(pj_str_t *p, NSString* text)
+{
+    char *buf = (char *)malloc(128 * sizeof(char));
+    p->ptr = buf;
+    p->slen = 0;
+    pj_bzero(buf, sizeof(buf));
+    pj_strcpy2(p, text.UTF8String);
+    p->ptr[p->slen] = '\0';
+}
 
 @implementation GSAccount {
     GSAccountConfiguration *_config;
@@ -38,6 +48,10 @@
         [center addObserver:self
                    selector:@selector(registrationStateDidChange:)
                        name:GSSIPRegistrationStateDidChangeNotification
+                     object:[GSDispatch class]];
+        [center addObserver:self
+                   selector:@selector(IMMessageDidReceive:)
+                       name:GSSIMMessageDidReceiveNotification
                      object:[GSDispatch class]];
     }
     return self;
@@ -98,6 +112,12 @@
     return YES;
 }
 
+- (BOOL)sendMessage:(NSString*)message toFriend:(GSAccountConfiguration *)friend;
+{
+    pj_str_t tmp_uri = [GSPJUtil PJStringWithString:[NSString stringWithFormat:@"sip:%@", friend.address]];
+    pj_str_t tmp_content = [GSPJUtil PJStringWithString:[NSString stringWithFormat:@"sip:%@", friend.address]];
+	return  (PJ_SUCCESS == pjsua_im_send(pjsua_acc_get_default(), &tmp_uri, NULL, &tmp_content, NULL, NULL));
+}
 
 - (BOOL)connect {
     NSAssert(!!_config, @"GSAccount not configured.");
@@ -185,5 +205,25 @@
     __block id self_ = self;
     dispatch_async(dispatch_get_main_queue(), ^{ [self_ setStatus:accStatus]; });
 }
+
+- (void)IMMessageDidReceive:(NSNotification *)notif {
+    pjsua_acc_id accountId = GSNotifGetInt(notif, GSSIPAccountIdKey);
+    if (accountId == PJSUA_INVALID_ID || accountId != _accountId)
+        return;
+    
+    
+    __block NSString *message = GSNotifGetString(notif, GSMessageKey);
+    __block GSAccount *self_ = self;
+    __block id delegate_ = _delegate;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (![delegate_ respondsToSelector:@selector(account:didReceiveIM:)])
+            return; // call is disposed/hungup on dealloc
+        
+        [delegate_ performSelector:@selector(account:didReceiveIM:)
+                        withObject:self_
+                        withObject:message];
+    });
+}
+
 
 @end

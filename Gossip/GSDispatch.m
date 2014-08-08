@@ -13,6 +13,9 @@ void onRegistrationState(pjsua_acc_id accountId);
 void onIncomingCall(pjsua_acc_id accountId, pjsua_call_id callId, pjsip_rx_data *rdata);
 void onCallMediaState(pjsua_call_id callId);
 void onCallState(pjsua_call_id callId, pjsip_event *e);
+void onPager(pjsua_call_id call_id, const pj_str_t *from,
+             const pj_str_t *to, const pj_str_t *contact,
+             const pj_str_t *mime_type, const pj_str_t *body);
 
 
 static dispatch_queue_t _queue = NULL;
@@ -30,6 +33,7 @@ static dispatch_queue_t _queue = NULL;
     uaConfig->cb.on_incoming_call = &onIncomingCall;
     uaConfig->cb.on_call_media_state = &onCallMediaState;
     uaConfig->cb.on_call_state = &onCallState;
+    uaConfig->cb.on_pager = &onPager;
 }
 
 
@@ -110,6 +114,21 @@ static dispatch_queue_t _queue = NULL;
                         userInfo:info];
 }
 
++ (void)dispatchPager:(pjsua_call_id)callId from:(const pj_str_t *)from to:(const pj_str_t *)to body:(const pj_str_t *)body {
+    NSString *message = [NSString stringWithUTF8String:body->ptr];
+    NSLog(@"Gossip: dispatchPager(%d) %@", callId, [NSString stringWithUTF8String:body->ptr]);
+    
+    NSDictionary *info = nil;
+    info = [NSDictionary dictionaryWithObjectsAndKeys:
+            [NSNumber numberWithInt:callId], GSSIPCallIdKey,
+            message, GSMessageKey, nil];
+    
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center postNotificationName:GSSIMMessageDidReceiveNotification
+                          object:self
+                        userInfo:info];
+}
+
 @end
 
 
@@ -150,4 +169,11 @@ void onCallMediaState(pjsua_call_id callId) {
 
 void onCallState(pjsua_call_id callId, pjsip_event *e) {
     dispatch(^{ [GSDispatch dispatchCallState:callId event:e]; });
+}
+
+void onPager(pjsua_call_id callId, const pj_str_t *from,
+                 const pj_str_t *to, const pj_str_t *contact,
+                 const pj_str_t *mime_type, const pj_str_t *body)
+{
+    dispatch(^{ [GSDispatch dispatchPager:callId from:from to:to body:body]; });
 }

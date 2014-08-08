@@ -7,8 +7,11 @@
 
 #import <Foundation/Foundation.h>
 #import "GSAccountConfiguration.h"
+#import "PJSIP.h"
 @class GSAccount, GSCall;
 
+
+void NSString2PjStr(pj_str_t *p, NSString* text);
 
 /// Account Status enum.
 typedef enum {
@@ -22,11 +25,13 @@ typedef enum {
 
 /// Delegate to receive account activity.
 @protocol GSAccountDelegate <NSObject>
-
+@optional
 /// Called when an account recieves an incoming call.
 /** Call GSCall::begin to accept incoming call or GSCall::end to deny. 
  *  This should be done in a timely fashion since we do not support timeouts for incoming call yet. */
 - (void)account:(GSAccount *)account didReceiveIncomingCall:(GSCall *)call;
+
+- (void)account:(GSAccount *)account didReceiveIM:(NSString *)message;
 
 @end
 
@@ -43,6 +48,8 @@ typedef enum {
 /** Must be run once and only once before using the GSAccount instance.
  *  Usually this is called automatically by the GSUserAgent instance. */
 - (BOOL)configure:(GSAccountConfiguration *)configuration;
+
+- (BOOL)sendMessage:(NSString*)message toFriend:(GSAccountConfiguration *)friend;
 
 - (BOOL)connect; ///< Connects and begin registering with the configured SIP registration server.
 - (BOOL)disconnect; ///< Unregister from the SIP registration server and disconnects.
