@@ -10,6 +10,7 @@
 #import "GSECallInitController.h"
 #import "GSECallViewController.h"
 #import "GSECodecsViewController.h"
+#import "GSEMessageInitController.h"
 
 
 @interface GSEMenuViewController () <GSAccountDelegate, UIAlertViewDelegate> @end
@@ -17,6 +18,7 @@
 
 @implementation GSEMenuViewController {
     GSECallInitController *_callInit;
+    GSEMessageInitController *_messageInit;
     GSCall *_incomingCall;
 }
 
@@ -76,7 +78,6 @@
                   context:nil];
 }
 
-
 - (void)userDidTapCodecs {
     GSECodecsViewController *controller = [GSECodecsViewController alloc];
     controller = [controller init];
@@ -122,6 +123,16 @@
     [_callInit makeNewCall];
 }
 
+- (IBAction)userDidTapSendMessage
+{
+    if (!_messageInit) {
+        _messageInit = [[GSEMessageInitController alloc] init];
+        _messageInit.navigationController = [self navigationController];
+    }
+    
+    [_messageInit makeNewMessage];
+}
+
 
 - (void)userDidPickupCall {
     GSECallViewController *controller = [[GSECallViewController alloc] init];
@@ -143,6 +154,7 @@
             [_connectButton setEnabled:YES];
             [_disconnectButton setEnabled:NO];
             [_makeCallButton setEnabled:NO];
+            [_sendMessageButton setEnabled:NO];
         } break;
             
         case GSAccountStatusConnecting: {
@@ -150,6 +162,7 @@
             [_connectButton setEnabled:NO];
             [_disconnectButton setEnabled:NO];
             [_makeCallButton setEnabled:NO];
+            [_sendMessageButton setEnabled:NO];
         } break;
             
         case GSAccountStatusConnected: {
@@ -157,6 +170,7 @@
             [_connectButton setEnabled:NO];
             [_disconnectButton setEnabled:YES];
             [_makeCallButton setEnabled:YES];
+            [_sendMessageButton setEnabled:YES];
         } break;
             
         case GSAccountStatusDisconnecting: {
@@ -164,6 +178,7 @@
             [_connectButton setEnabled:NO];
             [_disconnectButton setEnabled:NO];
             [_makeCallButton setEnabled:NO];
+            [_sendMessageButton setEnabled:NO];
         } break;
             
         case GSAccountStatusInvalid: {
@@ -171,6 +186,7 @@
             [_connectButton setEnabled:YES];
             [_disconnectButton setEnabled:NO];
             [_makeCallButton setEnabled:NO];
+            [_sendMessageButton setEnabled:NO];
         } break;
     }
 }

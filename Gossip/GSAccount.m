@@ -14,16 +14,6 @@
 #import "PJSIP.h"
 #import "Util.h"
 
-void NSString2PjStr(pj_str_t *p, NSString* text)
-{
-    char *buf = (char *)malloc(128 * sizeof(char));
-    p->ptr = buf;
-    p->slen = 0;
-    pj_bzero(buf, sizeof(buf));
-    pj_strcpy2(p, text.UTF8String);
-    p->ptr[p->slen] = '\0';
-}
-
 @implementation GSAccount {
     GSAccountConfiguration *_config;
 }
@@ -115,7 +105,7 @@ void NSString2PjStr(pj_str_t *p, NSString* text)
 - (BOOL)sendMessage:(NSString*)message toFriend:(GSAccountConfiguration *)friend;
 {
     pj_str_t tmp_uri = [GSPJUtil PJStringWithString:[NSString stringWithFormat:@"sip:%@", friend.address]];
-    pj_str_t tmp_content = [GSPJUtil PJStringWithString:[NSString stringWithFormat:@"sip:%@", friend.address]];
+    pj_str_t tmp_content = [GSPJUtil PJStringWithString:message];
 	return  (PJ_SUCCESS == pjsua_im_send(pjsua_acc_get_default(), &tmp_uri, NULL, &tmp_content, NULL, NULL));
 }
 

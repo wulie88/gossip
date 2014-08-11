@@ -16,6 +16,7 @@
 @property (nonatomic, strong) IBOutlet UIButton *connectButton;
 @property (nonatomic, strong) IBOutlet UIButton *disconnectButton;
 @property (nonatomic, strong) IBOutlet UIButton *makeCallButton;
+@property (nonatomic, strong) IBOutlet UIButton *sendMessageButton;
 
 - (IBAction)userDidTapCodecs;
 - (IBAction)userDidTapUseG729;
@@ -23,5 +24,6 @@
 - (IBAction)userDidTapConnect;
 - (IBAction)userDidTapDisconnect;
 - (IBAction)userDidTapMakeCall;
+- (IBAction)userDidTapSendMessage;
 
 @end

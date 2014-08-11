@@ -6,7 +6,6 @@
 //
 
 #import "GSEConfigurationViewController.h"
-#import "Gossip.h"
 #import "GSECodecsViewController.h"
 #import "GSEMenuViewController.h"
 
@@ -21,47 +20,53 @@
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     if (self = [super initWithNibName:nil bundle:nil]) {
-        _testAccounts = nil;
-        [self loadTestAccounts];
+        _testAccounts = [GSEConfigurationViewController accounts];
     }
     return self;
 }
 
-- (void)loadTestAccounts {
-    NSMutableArray *accounts = [NSMutableArray arrayWithCapacity:2];
+
+static GSAccountConfiguration *theCurrentAccount;
++ (GSAccountConfiguration *)currentAccount
+{
+    return theCurrentAccount;
+}
+
+
++ (void)setCurrentAccount:(GSAccountConfiguration*)currentAccount;
+{
+    theCurrentAccount = currentAccount;
+}
+
++ (NSArray*)accounts
+{
+    static NSMutableArray *accounts;
+    if (accounts) {
+        return accounts;
+    }
+    
+    accounts = [NSMutableArray array];
     
     GSAccountConfiguration *account = [GSAccountConfiguration defaultConfiguration];
-    account.address = @"chakrit@getonsip.com";
-    account.username = @"getonsip_chakrit";
-    account.password = @"3WLDiLdLaUQiA5rr";
-    account.domain = @"getonsip.com";
-    account.proxyServer = @"sip.onsip.com";
+    account.address = @"18627162511@192.168.1.16";
+    account.username = @"18627162511";
+    account.password = @"123456";
+    account.domain = @"112.126.65.201";
     [accounts addObject:account];
     
     account = [account copy];
-    account.address = @"chakrit2@getonsip.com";
-    account.username = @"getonsip_chakrit2";
-    account.password = @"RsbRokgpDZcbmuBT";
+    account.address = @"18827676190@192.168.1.16";
+    account.username = @"18827676190";
+    account.password = @"123456789";
     [accounts addObject:account];
     
-    account = [GSAccountConfiguration defaultConfiguration];
-    account.address = @"chakrit@sip2sip.info";
-    account.username = @"chakrit";
-    account.password = @"tyixr52w9k";
-    account.domain = @"sip2sip.info";
-    account.authRealm = @"sip2sip.info";
-    account.proxyServer = @"proxy.sipthor.net";
+    account = [account copy];
+    account.address = @"13995599202@192.168.1.16";
+    account.username = @"13995599202";
+    account.password = @"123456789";
     [accounts addObject:account];
     
-    account = [GSAccountConfiguration defaultConfiguration];
-    account.address = @"1664470@sipgate.co.uk";
-    account.username = @"1664470";
-    account.password = @"N34TYU8M";
-    account.domain = @"sipgate.co.uk";
-    account.proxyServer = @"sipgate.co.uk";
-    [accounts addObject:account];
-    
-    _testAccounts = [NSArray arrayWithArray:accounts];
+    return accounts;
 }
 
 - (void)dealloc {
@@ -136,7 +141,7 @@
     }
     
     GSAccountConfiguration *account = [_testAccounts objectAtIndex:row];
-    [[cell textLabel] setText:account.address];
+    [[cell textLabel] setText:account.username];
     
     return cell;
 }
@@ -147,6 +152,7 @@
         return;
     
     GSAccountConfiguration *account = [_testAccounts objectAtIndex:row];
+    [GSEConfigurationViewController setCurrentAccount:account];
     [self userDidSelectAccount:account];
 }
 

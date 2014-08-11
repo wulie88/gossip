@@ -10,9 +10,6 @@
 #import "PJSIP.h"
 @class GSAccount, GSCall;
 
-
-void NSString2PjStr(pj_str_t *p, NSString* text);
-
 /// Account Status enum.
 typedef enum {
     GSAccountStatusOffline, ///< Account is offline or no registration has been done.
